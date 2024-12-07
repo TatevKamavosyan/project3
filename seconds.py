@@ -1,25 +1,53 @@
 import time
 
+def is_valid_time_format(time_input):
+    # Ստուգում՝ արդյոք մուտքում կա երկու երկանորդակետ
+    if time_input.count(":") != 2:
+        return False
 
-def countdown_timer(hours, minutes, seconds):
-    total_seconds = hours * 3600 + minutes * 60 + seconds
+    # Ստուգում՝ արդյոք մուտքում միայն թվեր են և երկանորդակետեր
+    if not all(c.isdigit() or c == ":" for c in time_input):
+        return False
 
-    while total_seconds > 0:
-        hours_remaining, remainder = divmod(total_seconds, 3600)
-        minutes_remaining, seconds_remaining = divmod(remainder, 60)
-        
-        print("  {:02d}:{:02d}:{:02d}".format(hours_remaining,minutes_remaining,seconds_remaining))
-        
-        time.sleep(1)
-        total_seconds -= 1
+    return True
 
-    print("Time's up!!")
 
-# Input for hours, minutes, and seconds in the format h:m:s
-time_input = input("Enter time in the format h:m:s (e.g., 0:0:0): ")
+def countdown_timer():
+    try:
+        while True:
+            # Մուտքագրում՝ ժամ, րոպե, վայրկյան
+            time_input = input("Insert time to count down (hh:mm:ss): ")
 
-# Split the input string into hours, minutes, and seconds
-hours, minutes, seconds = map(int, time_input.split(':'))
+            # Ստուգել մուտքի ձևաչափը
+            if not is_valid_time_format(time_input):
+                print("Invalid format! Please use the format hh:mm:ss with only numbers and colons.")
+                continue  # Կրկին խնդրիր մուտքգրել ժամանակը
 
-# Start the countdown timer
-countdown_timer(hours, minutes, seconds)
+            # Մուտքի ժամանակները կտրել և վերածել թվերի
+            h, m, s = map(int, time_input.split(":"))
+
+            # Ստուգել ժամերի, րոպեների և վայրկյանների սահմանները
+            if not (0 <= h < 24 and 0 <= m < 60 and 0 <= s < 60):
+                print("Please ensure hours are 0-23, minutes and seconds are 0-59.")
+                continue  # Կրկին խնդրել մուտքագրում
+
+            # Հավաստի մուտքի դեպքում դուրս գալ ցիկլից
+            break
+
+        total_time = h * 3600 + m * 60 + s  # Պատրաստել ընդհանուր վայրկյաններ
+
+        while total_time >= 0:
+            # Կոնվերտացնել մնացած ժամանակը ժամերի, րոպեների ու վայրկյանների
+            hours, remainder = divmod(total_time, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            print(f"{hours:02d}:{minutes:02d}:{seconds:02d}")  # Սահմանված ձևաչափով
+            time.sleep(1)  # Սպասել մեկ վայրկյան
+            total_time -= 1
+
+        print("Time's up!")  # Երբ ժամանակը ավարտվի
+    except ValueError as e:
+        print(e)  # Տպել սխալի հաղորդագրությունը
+
+
+if __name__ == "__main__":
+    countdown_timer()
